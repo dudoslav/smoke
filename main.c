@@ -68,6 +68,11 @@ int main(int argc, char **argv) {
     int bytes = 0;
     int running = 1;
 
+    if(argc != 3) {
+        fprintf(stderr, "Usage: %s <server ip> <server port>\n", argv[0]);
+        return 1;
+    }
+
     if (!initSocket(&socketDesc, argv[1], argv[2])) {
         fprintf(stderr, "Failed in initializing socket\n");
         return 1;
