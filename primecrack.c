@@ -12,8 +12,6 @@ typedef struct {
 } divres_t; //Division result struct
 
 static int sqrtInvertStepFind(mpz_t number, divres_t *result, unsigned int pos, unsigned int count) {
-    //unsigned long int steps[] = {2, 2, 4, 2};
-
     int exitCode = 0;
 
     mpz_t pivotEnd, pivotStart, sqrtNum, interval, iter;
@@ -44,6 +42,11 @@ static int sqrtInvertStepFind(mpz_t number, divres_t *result, unsigned int pos, 
 
     mpz_init(iter);
     mpz_set(iter, pivotStart);
+
+    if (mpz_divisible_ui_p(iter, 2)) {
+        mpz_add_ui(iter, iter, 1);
+    }
+
     while (mpz_cmp(iter, pivotEnd) <= 0) {
 
         if (mpz_divisible_p(number, iter)) {
@@ -53,7 +56,7 @@ static int sqrtInvertStepFind(mpz_t number, divres_t *result, unsigned int pos, 
             break;
         }
 
-        mpz_add_ui(iter, iter, 1);
+        mpz_add_ui(iter, iter, 2);
 
     }
     mpz_clear(iter);
@@ -63,11 +66,10 @@ static int sqrtInvertStepFind(mpz_t number, divres_t *result, unsigned int pos, 
     mpz_clear(sqrtNum);
     mpz_clear(interval);
 
-    printf("Done cracking with code: %d\n", exitCode);
     return exitCode;
 }
 
-int crack(char *numberChar, int base, unsigned int pos, unsigned int count, crack_result_t *result) {
+int crack(char *numberChar, unsigned int pos, unsigned int count, crkres_t *crkres) {
     mpz_t number;
     mpz_init(number);
 
@@ -77,17 +79,15 @@ int crack(char *numberChar, int base, unsigned int pos, unsigned int count, crac
 
     int exitCode = 0;
 
-    if (!mpz_set_str(number, numberChar, base)) {
+    if (!mpz_set_str(number, numberChar, 10)) {
         exitCode = sqrtInvertStepFind(number, &divres, pos, count);
     } else {
         fprintf(stderr, "ERROR: failed to convert string into number. String: %s\n", numberChar);
     }
 
     if (exitCode) {
-        result->n1 = malloc(mpz_sizeinbase (divres.n1, 10) + 2);
-        result->n2 = malloc(mpz_sizeinbase (divres.n2, 10) + 2);
-        mpz_get_str(result->n1, 10, divres.n1);
-        mpz_get_str(result->n2, 10, divres.n2);
+        crkres->n1 = mpz_get_str(NULL, 10, divres.n1);
+        crkres->n2 = mpz_get_str(NULL, 10, divres.n2);
     }
 
     mpz_clear(number);

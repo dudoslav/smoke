@@ -4,8 +4,8 @@
 typedef struct {
     char *n1;
     char *n2;
-} crack_result_t;
+} crkres_t;
 
-int crack(char *numberChar, int base, unsigned int pos, unsigned int count, crack_result_t *result);
+int crack(char *numberChar, unsigned int pos, unsigned int count, crkres_t *crkres);
 
 #endif
